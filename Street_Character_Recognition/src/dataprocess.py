@@ -35,10 +35,15 @@ class SVHNDataset(Dataset):
         return len(self.img_path)
 
 
-train_path = glob.glob('./data/mchar_train/*.png')  # mchar_train文件中的所有图片
+train_path = glob.glob('/Users/zhaoyuanjiahui/Deep_Learning/tianchi/Street_Character_Recognition/data/mchar_train/*.png')  # mchar_train文件中的所有图片
 train_path.sort()  # 按字母顺序排列
-train_json = json.load(open('./data/train.json'))  # 载入json文件  路径容易写错
+train_json = json.load(open('/Users/zhaoyuanjiahui/Deep_Learning/tianchi/Street_Character_Recognition/data/train.json'))  # 载入json文件  路径容易写错
 train_label = [train_json[x]['label'] for x in train_json]  # 在标签的json文件中，将标签label的内容提取出来，存储为列表list[]
+
+# print(train_json['000000.png'])
+# print([train_json[x]['label'] for x in train_json])
+
+
 
 
 # 加入DataLoader的数据读取函数  DataLoader：对Dataset进行封装，提供批量读取的迭代读取
@@ -57,13 +62,18 @@ train_loader = torch.utils.data.DataLoader(
     # num_workers = 10 # 读取的线程个数
 )
 
+
+
+
 # 加入dataloader后，数据data的格式为  torch.Size([10,3,64,128]),torch.Size([10,6])
 
 
-val_path = glob.glob('./data/mchar_val/*.png')  # mchar_train文件中的所有图片
+val_path = glob.glob('/Users/zhaoyuanjiahui/Deep_Learning/tianchi/Street_Character_Recognition/data/mchar_val/*.png')  # mchar_train文件中的所有图片
 val_path.sort()  # 按字母顺序排列
-val_json = json.load(open('./data/val.json'))  # 载入json文件  路径容易写错
+val_json = json.load(open('/Users/zhaoyuanjiahui/Deep_Learning/tianchi/Street_Character_Recognition/data/val.json'))  # 载入json文件  路径容易写错
 val_label = [val_json[x]['label'] for x in val_json]
+
+# print(val_json['000000.png'])
 val_loader = torch.utils.data.DataLoader(
     SVHNDataset(val_path,val_label,
                 transforms.Compose([ # 数据扩增
@@ -78,6 +88,12 @@ val_loader = torch.utils.data.DataLoader(
     shuffle = False, # 是否打乱顺序
     # num_workers = 10 # 读取的线程个数
 )
+
+
+
+
+
+
 
 print("终于跑通了")
 

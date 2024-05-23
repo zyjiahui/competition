@@ -15,7 +15,7 @@ from torch.utils.data.dataset import Dataset
 import numpy as np
 
 
-# 定义模型
+# 定义模型  简单的卷积网络
 class SVHN_Model1(nn.Module):
     def __init__(self):
         super(SVHN_Model1,self).__init__()
@@ -28,7 +28,7 @@ class SVHN_Model1(nn.Module):
             nn.ReLU(),
             nn.MaxPool2d(2),
         )
-        # 6个全连接层分类
+        # 6个全连接层分类  给6个字符分11类  每一个最多6字符
         self.fc1 = nn.Linear(32*3*7,11)
         self.fc2 = nn.Linear(32*3*7,11)
         self.fc3 = nn.Linear(32*3*7,11)
@@ -54,8 +54,8 @@ class SVHN_Model1(nn.Module):
 def train(train_loader,model,criterion,optimizer,epoch):
     model.train()
     train_loss = []
-    for i,(data,target) in enumerate(train_loader):
-        c0,c1,c2,c3,c4,c5 = model(data)
+    for i,(data,target) in enumerate(train_loader):  # 迭代数据 
+        c0,c1,c2,c3,c4,c5 = model(data)  # 送进网络，计算损失
         loss = criterion(c0, target[:, 0]) + \
                 criterion(c1, target[:, 1]) + \
                 criterion(c2, target[:, 2]) + \
@@ -63,9 +63,9 @@ def train(train_loader,model,criterion,optimizer,epoch):
                 criterion(c4, target[:, 4]) + \
                 criterion(c5, target[:, 5])
         # loss /= 6
-        optimizer.zero_grad()
-        loss.backward()
-        optimizer.step()
+        optimizer.zero_grad()  # 每一轮梯度归零
+        loss.backward()  # 反向传播计算梯度
+        optimizer.step()  # 优化
         train_loss.append(loss.item())
     return np.mean(train_loss)
 
@@ -75,7 +75,7 @@ def validate(val_loader,model,criterion):
     model.eval()
     val_loss = []
 
-    with torch.no_grad():
+    with torch.no_grad():  # 步骤和训练类似，只是不用算梯度，计算损失就ok
         for i,(data,target) in enumerate(val_loader):
             c0, c1, c2, c3, c4, c5 = model(data)
             loss = criterion(c0, target[:, 0]) + \
@@ -93,7 +93,7 @@ def validate(val_loader,model,criterion):
 model = SVHN_Model1()
 
 
-
+# 上边封装了各种函数，Model，train，validate，下面进行训练验证
 # 训练与验证
 
 
@@ -101,24 +101,25 @@ lr = 0.001
 epochs = 10
 best_loss = 1000
 # 定义损失
-criterion = nn.CrossEntropyLoss()
+criterion = nn.CrossEntropyLoss()  # 使用交叉熵损失函数
 # 定义优化器
 optimizer = torch.optim.Adam(model.parameters(),lr=lr)
 
 
 for epoch in range(epochs):
-    print('Epoch: ',epoch)  # 这里输出了，后面卡住
+    print('Epoch: ',epoch+1)  # 这里输出了，后面卡住
 
     train_loss = train(train_loader,model,criterion,optimizer,epoch)  
-    print('Train loss:{}'.format(train_loss))
+    print('Train loss:{}'.format(train_loss))  # 训练一轮完毕，训练损失
     val_loss = validate(val_loader,model,criterion)
-    print('Val loss:{}'.format(val_loss))
+    print('Val loss:{}'.format(val_loss))  # 验证一轮完毕，验证损失
 
-    # 记录验证集精度
+    # 记录验证集精度，找出最小损失的模型保存
     if val_loss < best_loss:
         best_loss = val_loss
         torch.save(model.state_dict(),'./model.pt')  # 保存当前模型的参数，存储在model.pt中
-    print('第{}轮跑完'.format(epoch))
+    print('第{}轮跑完'.format(epoch+1))
+
 
 
 
